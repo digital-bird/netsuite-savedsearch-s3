@@ -1,0 +1,14 @@
+{
+	"paths": {
+		"hmac": "./lib/hmac-sha256.js",
+		"encB" : "./lib/enc-base64.js"
+	},
+	"shim":{
+		"hmac": {
+			"exports": "CryptoJS"
+		},
+		"oauth": {
+			"exports" : "OAuth"
+		}
+	}
+}
