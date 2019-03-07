@@ -224,7 +224,10 @@ export function execute(ctx){
 	if(lineLimit) lineLimit++; // include header
 
 	pagedResults.pageRanges.forEach(function(pageRange){
-
+		log.debug({
+			title:name,
+			details:'collecting page '+ pageRange.index
+		});
 		if(lineLimit && accum.length >= lineLimit) return;
 		var myPage = pagedResults.fetch({index: pageRange.index}); //5 Units
 		myPage.data.forEach(function(result){
@@ -244,6 +247,20 @@ export function execute(ctx){
 
 	if(lineLimit) accum = accum.slice(0, lineLimit);
 
+	if(!accum.length){
+		log.audit({
+			title:'no contents for '+name,
+			details:null
+		});
+		return;
+	}
+
+	log.audit({
+		title:'sending '+name,
+		details:accum.length +' lines'
+	});
+
+
 	var f = file.create({
 		name: name,
 		fileType: file.Type.CSV,
@@ -256,7 +273,7 @@ export function execute(ctx){
 		S3Key : me.getParameter({name:'custscript_kotn_s3_key'}),
 		S3Secret : me.getParameter({name:'custscript_kotn_s3_secret'}),
 		S3Bucket : me.getParameter({name:'custscript_kotn_s3_bucket'}),
-		S3Folder : me.getParameter({name:'custscript_kotn_s3_folder'}),
+		S3Folder : me.getParameter({name:'custscript_kotn_s3_folder'}) || '',
 		file:f
 	});
 
