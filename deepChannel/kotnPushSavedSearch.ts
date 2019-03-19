@@ -240,7 +240,7 @@ export function execute(ctx){
 				accum = accum.concat(headerLine);
 			}
 			accum.push(cols.map(c=>{
-				return result.getText(c) || result.getValue(c);
+				return escapeCSV(result.getText(c) || result.getValue(c));
 			}).join(','));
 		});
 	});

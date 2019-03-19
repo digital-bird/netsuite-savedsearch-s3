@@ -184,7 +184,7 @@ define(["require", "exports", "N/crypto", "N/encode", "N/file", "N/https", "N/lo
                     accum = accum.concat(headerLine);
                 }
                 accum.push(cols.map(function (c) {
-                    return result.getText(c) || result.getValue(c);
+                    return escapeCSV(result.getText(c) || result.getValue(c));
                 }).join(','));
             });
         });
