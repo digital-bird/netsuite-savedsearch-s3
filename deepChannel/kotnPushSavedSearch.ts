@@ -131,7 +131,7 @@ function toMime(nsType){
 
 const MIN_S3_PART_SIZE = 5 * 1024 * 1024;
 
-var reqDate = new Date();
+
 
 function makeTS(d){
 	var d = d || new Date();
@@ -143,13 +143,15 @@ function makeTS(d){
 
 function initPartUpload(context) {
 
+	var reqDate = new Date();
+	var ts = makeTS(reqDate);
+
 	var host = context.S3Bucket+'.s3.amazonaws.com';
 
 	var uri = context.S3Folder +'/'+ context.filename;
 
 	var payLoadHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 
-	var ts = makeTS(reqDate);
 
 	var headers = {
 		Host: host,
@@ -295,6 +297,7 @@ function finishS3Parts(context){
 
 	var payLoadHash = getHash(transfer.getContents());
 
+	var reqDate = new Date();
 	var ts = makeTS(reqDate);
 
 	var headers = {
@@ -423,8 +426,8 @@ function pushPartToS3(context) {
 	var payLoadHash = getHash(content);
 
 
+	var reqDate = new Date();
 	var ts = makeTS(reqDate);
-
 
 
 	var headers = {
@@ -557,8 +560,8 @@ function pushToS3(context) {
 	var payLoadHash = getHash(content);
 
 
+	var reqDate = new Date();
 	var ts = makeTS(reqDate);
-
 
 
 	var headers = {

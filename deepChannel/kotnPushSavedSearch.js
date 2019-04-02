@@ -99,16 +99,16 @@ define(["require", "exports", "N/crypto", "N/encode", "N/file", "N/https", "N/lo
         }
     }
     var MIN_S3_PART_SIZE = 5 * 1024 * 1024;
-    var reqDate = new Date();
     function makeTS(d) {
         var d = d || new Date();
         return d.toISOString().replace(/.\.\d+/, '').replace(/[-:]/g, '');
     }
     function initPartUpload(context) {
+        var reqDate = new Date();
+        var ts = makeTS(reqDate);
         var host = context.S3Bucket + '.s3.amazonaws.com';
         var uri = context.S3Folder + '/' + context.filename;
         var payLoadHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
-        var ts = makeTS(reqDate);
         var headers = {
             Host: host,
             'Content-Type': toMime(context.fileType),
@@ -224,6 +224,7 @@ define(["require", "exports", "N/crypto", "N/encode", "N/file", "N/https", "N/lo
         var host = context.S3Bucket + '.s3.amazonaws.com';
         var uri = context.S3Folder + '/' + context.filename;
         var payLoadHash = getHash(transfer.getContents());
+        var reqDate = new Date();
         var ts = makeTS(reqDate);
         var headers = {
             Host: host,
@@ -321,6 +322,7 @@ define(["require", "exports", "N/crypto", "N/encode", "N/file", "N/https", "N/lo
         var host = context.S3Bucket + '.s3.amazonaws.com';
         var uri = context.S3Folder + '/' + transfer.name;
         var payLoadHash = getHash(content);
+        var reqDate = new Date();
         var ts = makeTS(reqDate);
         var headers = {
             Host: host,
@@ -421,6 +423,7 @@ define(["require", "exports", "N/crypto", "N/encode", "N/file", "N/https", "N/lo
         var host = context.S3Bucket + '.s3.amazonaws.com';
         var uri = context.S3Folder + '/' + transfer.name;
         var payLoadHash = getHash(content);
+        var reqDate = new Date();
         var ts = makeTS(reqDate);
         var headers = {
             Host: host,
