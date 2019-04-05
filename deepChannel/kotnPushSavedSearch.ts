@@ -717,6 +717,7 @@ export function execute(ctx){
 	var S3Parts = new S3PartsPush(name);
 
 	var accum = "";
+	var sentHeader = false;
 	const pagedResults = srch.runPaged({pageSize:1000}); //5 units
 
 	var linesReported = 0;
@@ -731,11 +732,12 @@ export function execute(ctx){
 		myPage.data.forEach(function(result){
 			if(lineLimit && linesReported >= lineLimit) return;
 			var cols = result.columns;
-			if(!accum.length){
+			if(!sentHeader){
 				// add header
 				var headerLine = cols.map(c=>{
 					return escapeCSV(c.label || c.name);
 				}).join(',');
+				sentHeader = true;
 				accum += headerLine;
 			}
 			linesReported++;
