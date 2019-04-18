@@ -25,12 +25,14 @@ The saved search must be set to Public in order to be selected as a script param
 ## Installation
 
 Install the following files at some location in your Netsuite account's Suitescripts folder. These should all be at the same level.
+- kotnHandleS3Push.js
+- kotnPushDeferredSearch.js
 - kotnPushSavedSearch.js
 - kotnVaultAPISecret.js
 - oauthShim.json
 - lib
 
-### Create a scheduled script.
+### Create a scheduled script for managing the file generation process.
 Select kotnPushSavedSearch.js
 
 In order to work with the baked in script ids in the vaulting script give this script an id of `_kotn_push_search_s3`
@@ -42,6 +44,8 @@ The scheduled script needs the following parameters:
 - Use Timestamp, custscript_kotn_s3_use_ts, Checkbox; default this to checked if you want the filename of the pushed file to have a timestamp.
 - Limit Lines, custscript_kotn_s3_lines, Integer; this would be used in case the results need to be truncated at some maximum number of lines
 - S3 Folder, custscript_kotn_s3_folder, Free-Form Text; If this has a value it should include the leading / (e.g., /transfer) but should be blank if files are transferred to the top level of the bucket.
+- Deferred Search Storage Folder, custscript_kotn_s3_defer_folder, Free-Form Text; This will be the folder where large files are staged for pushing to S3 when the search is complete
+- Deferred Script Deployment, custscript_kotn_s3_defer_dep, Free-Form Text; This will be the deployment id of a scheduled script that takes a finished saved search from the Deferred Search Storage Folder and pushes it to S3. When the search being managed will result in a 'large' file then the _Deferred X_ parameters may be used to handle pushing the file so that the script doesn't fail due to Netsuite's script governance. The deployment ids for this field should come from deployments of the __Push Deferred Search to S3__ script described below.
 
 #### Company Preference
 To aid management with multiple deployments make these parameters company preference.
@@ -67,6 +71,21 @@ Go back to the scheduled script tab and deploy the script.
 - set an S3 Folder path. Leave blank for the top level but start any real path with a forward slash _e.g, /test_
 - you can save and run the scheduled script and verify the saved search is converted to a CSV in your S3 bucket.
 - once verified you can schedule your script deployment on whatever frequency is recommended by Deep Channel.
+
+### Create 'Push Deferred Search to S3' a scheduled script for pushing large files to S3.
+Select kotnPushDeferredSearch.js
+
+In order to work with the baked in script ids in the vaulting script give this script an id of `_kotn_s3_defer_transfer`
+
+The scheduled script needs the following parameters:
+
+#### Default Preference
+- S3 Folder, custscript_kotn_deferred_s3_folder, Free-Form Text;
+- Search Results File, custscript_kotn_deferred_s3_file, Free-Form Text;
+
+Both of these may be left blank if this script's deployments will only be used with the `kotnPushSavedSearch.js` script.
+
+It is recommended that each deployment of the standard push script that anticipates a large file be paired with a unique deployment of this script.
 
 ### Create a suitelet
 - Select kotnVaultAPISecret.js and create a suitelet. The bundle includes a link for this suitelet under the Setup -> Integration path.
