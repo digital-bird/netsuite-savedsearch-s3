@@ -16,7 +16,7 @@ function onRequest(context) {
 		var secretField = form.addSecretKeyField({
 			id : 'vaulted_gid',
 			label : 'Token',
-			restrictToScriptIds : ['customscript_kotn_s3_test', 'customscript_kotn_push_search_s3'],
+			restrictToScriptIds : ['customscript_kotn_s3_test', 'customscript_kotn_push_search_s3', 'customscript_kotn_s3_defer_transfer'],
 			restrictToCurrentUser : false
 		});
 
