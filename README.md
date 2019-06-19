@@ -40,19 +40,20 @@ In order to work with the baked in script ids in the vaulting script give this s
 The scheduled script needs the following parameters:
 
 #### Default Preference
-- Target Search, custscript_kotn_s3_search, List, Saved Search
-- Use Timestamp, custscript_kotn_s3_use_ts, Checkbox; default this to checked if you want the filename of the pushed file to have a timestamp.
-- Limit Lines, custscript_kotn_s3_lines, Integer; this would be used in case the results need to be truncated at some maximum number of lines
-- S3 Folder, custscript_kotn_s3_folder, Free-Form Text; If this has a value it should include the leading / (e.g., /transfer) but should be blank if files are transferred to the top level of the bucket.
-- Deferred Search Storage Folder, custscript_kotn_s3_defer_folder, Free-Form Text; This will be the folder where large files are staged for pushing to S3 when the search is complete
-- Deferred Script Deployment, custscript_kotn_s3_defer_dep, Free-Form Text; This will be the deployment id of a scheduled script that takes a finished saved search from the Deferred Search Storage Folder and pushes it to S3. When the search being managed will result in a 'large' file then the _Deferred X_ parameters may be used to handle pushing the file so that the script doesn't fail due to Netsuite's script governance. The deployment ids for this field should come from deployments of the __Push Deferred Search to S3__ script described below.
+- Target Search, _custscript_kotn_s3_search_, List, Saved Search
+- Use Timestamp, _custscript_kotn_s3_use_ts_, Checkbox; default this to checked if you want the filename of the pushed file to have a timestamp.
+- Limit Lines, _custscript_kotn_s3_lines_, Integer; this would be used in case the results need to be truncated at some maximum number of lines
+- S3 Folder, _custscript_kotn_s3_folder_, Free-Form Text; If this has a value it should include the leading / (e.g., /transfer) but should be blank if files are transferred to the top level of the bucket.
+- Deferred Search Storage Folder, _custscript_kotn_s3_defer_folder_, Free-Form Text; This will be the folder where large files are staged for pushing to S3 when the search is complete
+- Deferred Script Deployment, _custscript_kotn_s3_defer_dep_, Free-Form Text; This will be the deployment id of a scheduled script that takes a finished saved search from the Deferred Search Storage Folder and pushes it to S3. When the search being managed will result in a 'large' file then the _Deferred X_ parameters may be used to handle pushing the file so that the script doesn't fail due to Netsuite's script governance. The deployment ids for this field should come from deployments of the __Push Deferred Search to S3__ script described below.
+- Enable in Sandbox, _custscript_kotn_s3_enable_in_sandbox_, Checkbox; Check this if you want to test the scheduled script in a sandbox environment.
 
 #### Company Preference
 To aid management with multiple deployments make these parameters company preference.
-- S3 Region, custscript_kotn_s3_region, Free-Form Text; The region of the bucket [see S3 Regions](https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
-- S3 Bucket, custscript_kotn_s3_bucket, Free-Form Text; The simple bucket name -- not the ARN.
-- S3 Key, custscript_kotn_s3_key, Free-Form Text; the access key for the user you've set up with write access to the bucket
-- S3 Secret, custscript_kotn_s3_secret, Free-Form Text; the access secret GUID for the S3 user.
+- S3 Region, _custscript_kotn_s3_region_, Free-Form Text; The region of the bucket [see S3 Regions](https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
+- S3 Bucket, _custscript_kotn_s3_bucket_, Free-Form Text; The simple bucket name -- not the ARN.
+- S3 Key, _custscript_kotn_s3_key_, Free-Form Text; the access key for the user you've set up with write access to the bucket
+- S3 Secret, _custscript_kotn_s3_secret_, Free-Form Text; the access secret GUID for the S3 user.
 
 When you save the script definition you can enter your S3 configuration.
 - open Setup -> Company -> General Preferences in a new tab
@@ -80,8 +81,9 @@ In order to work with the baked in script ids in the vaulting script give this s
 The scheduled script needs the following parameters:
 
 #### Default Preference
-- S3 Folder, custscript_kotn_deferred_s3_folder, Free-Form Text;
-- Search Results File, custscript_kotn_deferred_s3_file, Free-Form Text;
+- S3 Folder, _custscript_kotn_deferred_s3_folder_, Free-Form Text;
+- Search Results File, _custscript_kotn_deferred_s3_file_, Free-Form Text;
+- Enable in Sandbox, _custscript_kotn_s3d_enable_in_sandbox_, Checkbox; Check this if you want to test the scheduled script in a sandbox environment.
 
 Both of these may be left blank if this script's deployments will only be used with the `kotnPushSavedSearch.js` script.
 
