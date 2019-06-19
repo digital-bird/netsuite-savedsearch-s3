@@ -252,9 +252,15 @@ function initPartUpload(context) {
 	// 	details:JSON.stringify(headers, null, ' ')
 	// });
 
-	var resp = http.post({
-		url: 'https://'+host + uri  +'?uploads',
-		body: null,
+	// var resp = http.post({
+	// 	url: 'https://'+host + uri  +'?uploads',
+	// 	body: null,
+	// 	headers:headers
+	// });
+
+	var resp = httpWithRetry(http.post, context, {
+		url:'https://'+host + uri  +'?uploads',
+		body: null, 
 		headers:headers
 	});
 
@@ -400,7 +406,8 @@ function finishS3Parts(context){
 	// 	details:JSON.stringify(headers, null, ' ')
 	// });
 
-	var resp = http.post({
+
+	var resp = httpWithRetry(http.post, context, {
 		url: 'https://'+host + uri  +'?uploadId='+ encodeURIComponent(context.uploadId),
 		body: transfer.getContents(),
 		headers:headers
@@ -530,7 +537,7 @@ function pushPartToS3(context) {
 	// 	details:JSON.stringify(headers, null, ' ')
 	// });
 
-	var resp = http.put({
+	var resp = httpWithRetry(http.put, context, {
 		url: 'https://'+host + uri +'?partNumber='+ context.partNumber +'&uploadId='+encodeURIComponent(context.uploadId),
 		body: content,
 		headers:headers
@@ -572,6 +579,29 @@ function syncDelay(delayTime, context){
 
 		delayHMAC.digest({ outputEncoding: encode.Encoding.BASE_64_URL_SAFE});
 	}
+}
+
+function httpWithRetry(verb, context, callSpec: http.PostOptions | http.PutOptions | http.GetOptions){
+	var origErr  = null;
+	var tries = 3;
+	var resp = null;
+	while(tries){
+		tries--;
+		try{
+			//if(tries == 2) throw "Test Error";
+			resp = verb.call(http, callSpec);
+			break; //no error end the loop
+		}catch(e){
+			if(!origErr) origErr = e;
+			if(!tries) throw origErr || e;
+			log.error({
+				title:'sending part to S3 with' + tries +' left',
+				details: (e.message || e.toString()) + (e.getStackTrace ? (' \n \n' + e.getStackTrace().join(' \n')) : '')
+			});
+			syncDelay(5000, context);
+		}
+	}
+	return resp;
 }
 
 function pushToS3(context) {
@@ -685,28 +715,12 @@ function pushToS3(context) {
 	// 	details:JSON.stringify(headers, null, ' ')
 	// });
 	
-	var origErr  = null;
-	var tries = 3;
-	var resp = null;
-	while(tries){
-		tries--;
-		try{
-			resp = http.put({
-				url: 'https://'+host + uri,
-				body: content,
-				headers:headers
-			});
-			break; //no error end the loop
-		}catch(e){
-			if(!origErr) origErr = e;
-			if(!tries) throw origErr || e;
-			log.error({
-				title:'sending part to S3',
-				details: (e.message || e.toString()) + (e.getStackTrace ? (' \n \n' + e.getStackTrace().join(' \n')) : '')
-			});
-			syncDelay(5000, context);
-		}
-	}
+	var resp = httpWithRetry(http.put, context, {
+		url:'https://'+host + uri, 
+		body:content, 
+		headers:headers
+	});
+	
 
 	log.audit({
 		title: 'sent: '+ context.file.name,
