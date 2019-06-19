@@ -21,7 +21,17 @@ function escapeCSV(val){
 }
 
 export function execute(ctx){
-	var me = runtime.getCurrentScript();
+	var me : runtime.Script = runtime.getCurrentScript();
+	if(runtime.envType == runtime.EnvType.SANDBOX){
+		var sbEnabled = me.getParameter({name:'custscript_kotn_s3d_enable_in_sandbox'});
+		if(!sbEnabled){
+			log.audit({
+				title:me.id,
+				details:'skipping sandbox run'
+			});
+			return;
+		}
+	}
 	var s3Folder = me.getParameter({name:'custscript_kotn_deferred_s3_folder'});
 	var nsFilePath = me.getParameter({name:'custscript_kotn_deferred_s3_file'});
 

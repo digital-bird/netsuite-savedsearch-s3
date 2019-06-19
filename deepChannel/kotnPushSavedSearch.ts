@@ -27,6 +27,16 @@ function escapeCSV(val){
 
 export function execute(ctx){
 	var me = runtime.getCurrentScript();
+	if(runtime.envType == runtime.EnvType.SANDBOX){
+		var sbEnabled = me.getParameter({name:'custscript_kotn_s3_enable_in_sandbox'});
+		if(!sbEnabled){
+			log.audit({
+				title:me.id,
+				details:'skipping sandbox run'
+			});
+			return;
+		}
+	}
 	var searchId = parseInt(me.getParameter({name:'custscript_kotn_s3_search'}));
 	var includeTS = me.getParameter({name:'custscript_kotn_s3_use_ts'});
 	var lineLimit = parseInt(me.getParameter({name:'custscript_kotn_s3_lines'}),10) || 0;
