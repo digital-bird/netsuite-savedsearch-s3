@@ -553,6 +553,27 @@ function pushPartToS3(context) {
 	};
 }
 
+function syncDelay(delayTime, context){
+	var tsEnd = Date.now() + delayTime;
+	while(Date.now() < tsEnd){
+		//Use hmac since it has some computational expense but costs no governance
+		var delayHMAC = crypto.createHmac({
+	        algorithm: crypto.HashAlg.SHA256,
+	        key: crypto.createSecretKey({
+	            guid: context.S3Secret,
+	            encoding: encode.Encoding.UTF_8
+	        })
+	    });
+		var ts = Date.now();
+	    delayHMAC.update({
+	    	input: (Math.atan(ts) * Math.tan(ts)).toFixed(8), 
+	    	inputEncoding:encode.Encoding.UTF_8
+	    });
+
+		delayHMAC.digest({ outputEncoding: encode.Encoding.BASE_64_URL_SAFE});
+	}
+}
+
 function pushToS3(context) {
 
 	var transfer = context.file;
@@ -663,12 +684,29 @@ function pushToS3(context) {
 	// 	title:'headers',
 	// 	details:JSON.stringify(headers, null, ' ')
 	// });
-
-	var resp = http.put({
-		url: 'https://'+host + uri,
-		body: content,
-		headers:headers
-	});
+	
+	var origErr  = null;
+	var tries = 3;
+	var resp = null;
+	while(tries){
+		tries--;
+		try{
+			resp = http.put({
+				url: 'https://'+host + uri,
+				body: content,
+				headers:headers
+			});
+			break; //no error end the loop
+		}catch(e){
+			if(!origErr) origErr = e;
+			if(!tries) throw origErr || e;
+			log.error({
+				title:'sending part to S3',
+				details: (e.message || e.toString()) + (e.getStackTrace ? (' \n \n' + e.getStackTrace().join(' \n')) : '')
+			});
+			syncDelay(5000, context);
+		}
+	}
 
 	log.audit({
 		title: 'sent: '+ context.file.name,
